@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:global_coin/models/currency_model.dart';
 import 'package:global_coin/res/components/currency_button.dart';
 import 'package:global_coin/viewModel/currency_controller.dart';
+import 'package:global_coin/viewModel/currency_type_controller.dart';
 import 'package:intl/intl.dart';
 
 class HomeView extends StatefulWidget {
@@ -17,25 +19,21 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
-    currencyController.fetchCurrencyRatio();
-    currencyController.fetchCurrencyDetails();
+    currencyController.fetchCurrencyData();
   }
 
   final currencyController = Get.put(CurrencyController());
-
-  void showCurrencytype() async {}
+  final typeController = Get.put(CurrencyTypeController());
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final model = currencyController.ratioModel.value;
-    final detailsmodel = currencyController.detailsModel.value;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Global Coin'),
         centerTitle: true,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 10,
@@ -83,7 +81,7 @@ class _HomeViewState extends State<HomeView> {
             const Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                CurrencyButton(),
+                CurrencyButton(buttonName: 'Current'),
               ],
             ),
             const Gap(10),
@@ -124,23 +122,39 @@ class _HomeViewState extends State<HomeView> {
             const Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                CurrencyButton(),
+                CurrencyButton(buttonName: 'To'),
               ],
             ),
-            const Spacer(),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.colorScheme.primary,
-                fixedSize: Size(Get.width, Get.height * .06),
-              ),
-              onPressed: () {},
-              child: Text(
-                'Convert',
-                style: theme.textTheme.bodyLarge!.copyWith(
-                  color: theme.colorScheme.onPrimary,
+            Container(
+              height: Get.height * .25,
+              alignment: Alignment.bottomCenter,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.colorScheme.primary,
+                  fixedSize: Size(Get.width, Get.height * .06),
+                ),
+                onPressed: () {
+                  List<Currency> matchingItems = currencyController.currencies
+                      .where((item) =>
+                          item.currencyCode == typeController.toType.value)
+                      .toList();
+
+                  if (matchingItems.isNotEmpty) {
+                    Currency result = matchingItems.first;
+                    typeController.result.value =
+                        (int.parse(typeController.textfield.value.text) *
+                                result.rate)
+                            .toStringAsFixed(2);
+                  }
+                },
+                child: Text(
+                  'Convert',
+                  style: theme.textTheme.bodyLarge!.copyWith(
+                    color: theme.colorScheme.onPrimary,
+                  ),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
