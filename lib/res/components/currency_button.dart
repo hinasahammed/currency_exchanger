@@ -104,7 +104,7 @@ class _CurrencyButtonState extends State<CurrencyButton> {
                     child: Text(
                       currencyTypeController.result.value,
                       style: theme.textTheme.displaySmall!.copyWith(
-                        color: theme.colorScheme.onBackground,
+                        color: theme.colorScheme.primary,
                         fontWeight: FontWeight.bold,
                         fontSize:
                             currencyTypeController.result.value.length >= 13

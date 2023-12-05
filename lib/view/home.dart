@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
-import 'package:global_coin/models/currency_model.dart';
 import 'package:global_coin/res/components/currency_button.dart';
 import 'package:global_coin/viewModel/currency_controller.dart';
 import 'package:global_coin/viewModel/currency_type_controller.dart';
@@ -19,7 +18,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
-    currencyController.fetchCurrencyData();
+    currencyController.fetchData();
   }
 
   final currencyController = Get.put(CurrencyController());
@@ -134,18 +133,9 @@ class _HomeViewState extends State<HomeView> {
                   fixedSize: Size(Get.width, Get.height * .06),
                 ),
                 onPressed: () {
-                  List<Currency> matchingItems = currencyController.currencies
-                      .where((item) =>
-                          item.currencyCode == typeController.toType.value)
-                      .toList();
-
-                  if (matchingItems.isNotEmpty) {
-                    Currency result = matchingItems.first;
-                    typeController.result.value =
-                        (int.parse(typeController.textfield.value.text) *
-                                result.rate)
-                            .toStringAsFixed(2);
-                  }
+                  typeController.type.value == "USD"
+                      ? currencyController.convertNormal()
+                      : currencyController.convertAnyToAny();
                 },
                 child: Text(
                   'Convert',
